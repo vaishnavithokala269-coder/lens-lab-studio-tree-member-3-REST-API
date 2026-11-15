@@ -1,0 +1,199 @@
+### ==============================================================================
+### LensLab Studio API - HTTP Request Test Suite
+### Member 5: API Testing & Documentation
+### Files Owned: postman/LensLab.postman_collection.json, api.http, README.md, MEMBER_CONTRIBUTION_GUIDE.md
+### Compatible with REST Client (VS Code), IntelliJ HTTP Client, Bruno, and similar tools.
+### Ensure the server is running on port 3000 (`npm start`) before executing requests.
+### ==============================================================================
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+###############################################################################
+# 0. ROOT / HEALTH CHECK ENDPOINT
+###############################################################################
+
+### Get Root API Status
+GET {{baseUrl}}/
+
+
+###############################################################################
+# 1. SPECIAL TWIST: CAMERA SUMMARY BY KIND (GROUP BY)
+###############################################################################
+
+### Get Camera Summary by Kind (Aggregated with SQLite GROUP BY)
+# Returns array of [{ kind: "...", count: N }] or [] if no cameras exist
+GET {{baseUrl}}/cameras/summary
+
+
+###############################################################################
+# 2. PHOTOGRAPHER ENDPOINTS
+###############################################################################
+
+### Get All Photographers
+GET {{baseUrl}}/photographers
+
+### Add Photographer 1 (Rohan Verma)
+POST {{baseUrl}}/photographers
+Content-Type: {{contentType}}
+
+{
+  "name": "Rohan Verma",
+  "phone": "+91 9876543210",
+  "email": "rohan.v@lenslab.com"
+}
+
+### Add Photographer 2 (Priya Sharma - optional email omitted)
+POST {{baseUrl}}/photographers
+Content-Type: {{contentType}}
+
+{
+  "name": "Priya Sharma",
+  "phone": "+91 9123456780"
+}
+
+
+###############################################################################
+# 3. CAMERA ENDPOINTS (CRUD & FILTERING)
+###############################################################################
+
+### Get All Cameras
+GET {{baseUrl}}/cameras
+
+### Search Cameras by Kind (kind=DSLR)
+GET {{baseUrl}}/cameras?kind=DSLR
+
+### Search Cameras by Kind (kind=Mirrorless)
+GET {{baseUrl}}/cameras?kind=Mirrorless
+
+### Add Camera 1 (DSLR - Canon EOS 1500D)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "name": "Canon EOS 1500D",
+  "kind": "DSLR"
+}
+
+### Add Camera 2 (DSLR - Nikon D7500)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "name": "Nikon D7500",
+  "kind": "DSLR"
+}
+
+### Add Camera 3 (Mirrorless - Sony Alpha A7 IV)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "name": "Sony Alpha A7 IV",
+  "kind": "Mirrorless"
+}
+
+### Add Camera 4 (Mirrorless - Fujifilm X-T4)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "name": "Fujifilm X-T4",
+  "kind": "Mirrorless"
+}
+
+### Get Camera by ID (ID: 1)
+GET {{baseUrl}}/cameras/1
+
+### Update Camera (ID: 1)
+PUT {{baseUrl}}/cameras/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Canon EOS 1500D Mark II",
+  "kind": "DSLR"
+}
+
+### Delete Camera by ID (ID: 4)
+DELETE {{baseUrl}}/cameras/4
+
+
+###############################################################################
+# 4. RENTAL ENDPOINTS (RELATIONSHIPS & SQL JOIN)
+###############################################################################
+
+### Get All Rentals (SQL JOIN returning photographer_name, camera_name, kind, dates)
+GET {{baseUrl}}/rentals
+
+### Add Rental (Assign Camera 1 to Photographer 1)
+POST {{baseUrl}}/rentals
+Content-Type: {{contentType}}
+
+{
+  "photographer_id": 1,
+  "camera_id": 1,
+  "rental_date": "2026-11-20",
+  "return_date": "2026-11-22"
+}
+
+### Add Rental (Without Return Date - Ongoing Rental)
+POST {{baseUrl}}/rentals
+Content-Type: {{contentType}}
+
+{
+  "photographer_id": 2,
+  "camera_id": 2,
+  "rental_date": "2026-11-25"
+}
+
+
+###############################################################################
+# 5. ERROR HANDLING & VALIDATION TEST CASES
+###############################################################################
+
+### Add Camera - Missing Name (Expect 400 Bad Request)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "kind": "DSLR"
+}
+
+### Add Camera - Missing Kind (Expect 400 Bad Request)
+POST {{baseUrl}}/cameras
+Content-Type: {{contentType}}
+
+{
+  "name": "Sony FX3"
+}
+
+### Add Photographer - Missing Name (Expect 400 Bad Request)
+POST {{baseUrl}}/photographers
+Content-Type: {{contentType}}
+
+{
+  "phone": "+91 9876543210"
+}
+
+### Add Rental - Nonexistent Foreign Key (Expect 400 Bad Request)
+POST {{baseUrl}}/rentals
+Content-Type: {{contentType}}
+
+{
+  "photographer_id": 9999,
+  "camera_id": 9999,
+  "rental_date": "2026-11-20"
+}
+
+### Get Camera - Nonexistent ID (Expect 404 Not Found)
+GET {{baseUrl}}/cameras/9999
+
+### Delete Camera - Nonexistent ID (Expect 404 Not Found)
+DELETE {{baseUrl}}/cameras/9999
+
+### Delete Camera - Active Rental Constraint (Expect 409 Conflict)
+# Camera 1 has an active rental record; PRAGMA foreign_keys = ON prevents deletion
+DELETE {{baseUrl}}/cameras/1
+
+### Route Not Found Test (Expect 404 Not Found)
+GET {{baseUrl}}/unknown-route
