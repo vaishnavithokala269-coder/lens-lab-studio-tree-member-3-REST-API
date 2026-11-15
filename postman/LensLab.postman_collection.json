@@ -1,0 +1,532 @@
+{
+  "info": {
+    "_postman_id": "lenslab-studio-yg-cse2e-g05",
+    "name": "LensLab Studio API Testing",
+    "description": "Comprehensive Postman API test collection for LensLab Studio (Camera Rental Management System). Maintained by Member 5 (API Testing & Documentation). Covers Twist Tests, Photographer Management, Camera CRUD, Search, Rental JOIN, Validation, and HTTP Error Handling.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Twist Tests (Summary by Kind)",
+      "item": [
+        {
+          "name": "Twist Test 3 (Initial): Get Summary - Empty Table (Expect 200 and [])",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "summary"]
+            },
+            "description": "Test 3: Calling GET /cameras/summary when camera table is empty returns HTTP 200 and []."
+          }
+        },
+        {
+          "name": "Twist Test 1: Add DSLR Camera 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Canon EOS 1500D\",\n  \"kind\": \"DSLR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Test 1 setup: Add camera of kind DSLR."
+          }
+        },
+        {
+          "name": "Twist Test 1: Add DSLR Camera 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nikon D7500\",\n  \"kind\": \"DSLR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Test 1 setup: Add second camera of kind DSLR."
+          }
+        },
+        {
+          "name": "Twist Test 1: Add Mirrorless Camera 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sony Alpha A7 IV\",\n  \"kind\": \"Mirrorless\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Test 1 setup: Add camera of kind Mirrorless."
+          }
+        },
+        {
+          "name": "Twist Test 2: Get Camera Summary (GROUP BY)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "summary"]
+            },
+            "description": "Test 2: GET /cameras/summary returns HTTP 200 with counts per kind using SQLite GROUP BY."
+          }
+        },
+        {
+          "name": "Twist Test 3: Teardown - Delete Camera 1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "1"]
+            },
+            "description": "Delete camera 1 to prepare for Test 3 empty verification."
+          }
+        },
+        {
+          "name": "Twist Test 3: Teardown - Delete Camera 2",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "2"]
+            },
+            "description": "Delete camera 2 to prepare for Test 3 empty verification."
+          }
+        },
+        {
+          "name": "Twist Test 3: Teardown - Delete Camera 3",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/3",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "3"]
+            },
+            "description": "Delete camera 3 to leave cameras table empty."
+          }
+        },
+        {
+          "name": "Twist Test 3: Verify Empty Table Summary (Expect 200 and [])",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "summary"]
+            },
+            "description": "Test 3: After deleting all cameras, GET /cameras/summary returns HTTP 200 with []."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Camera Operations (CRUD & Search)",
+      "item": [
+        {
+          "name": "Add Camera",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fujifilm X-T4\",\n  \"kind\": \"Mirrorless\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Add a new camera."
+          }
+        },
+        {
+          "name": "Get All Cameras",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Retrieve all camera records."
+          }
+        },
+        {
+          "name": "Get Camera By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/4",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "4"]
+            },
+            "description": "Retrieve single camera by ID."
+          }
+        },
+        {
+          "name": "Update Camera",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fujifilm X-T4 Professional Edition\",\n  \"kind\": \"Mirrorless\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras/4",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "4"]
+            },
+            "description": "Update camera name and kind."
+          }
+        },
+        {
+          "name": "Search Cameras by Kind (kind=Mirrorless)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras?kind=Mirrorless",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"],
+              "query": [
+                {
+                  "key": "kind",
+                  "value": "Mirrorless"
+                }
+              ]
+            },
+            "description": "Filter cameras by query parameter ?kind=Mirrorless."
+          }
+        },
+        {
+          "name": "Search Cameras by Kind (kind=DSLR)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras?kind=DSLR",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"],
+              "query": [
+                {
+                  "key": "kind",
+                  "value": "DSLR"
+                }
+              ]
+            },
+            "description": "Filter cameras by query parameter ?kind=DSLR."
+          }
+        },
+        {
+          "name": "Delete Camera",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/4",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "4"]
+            },
+            "description": "Delete a camera by ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Validation & Error Handling",
+      "item": [
+        {
+          "name": "Add Camera - Missing Name (Expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"DSLR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Attempt to create camera without name. Expects HTTP 400."
+          }
+        },
+        {
+          "name": "Add Camera - Missing Kind (Expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Canon EOS 200D\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras"]
+            },
+            "description": "Attempt to create camera without kind. Expects HTTP 400."
+          }
+        },
+        {
+          "name": "Update Camera - Missing Values (Expect 400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cameras/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "1"]
+            },
+            "description": "Attempt to update camera with empty name. Expects HTTP 400."
+          }
+        },
+        {
+          "name": "Get Camera - Nonexistent ID (Expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "9999"]
+            },
+            "description": "Retrieve camera by nonexistent ID. Expects HTTP 404."
+          }
+        },
+        {
+          "name": "Delete Camera - Nonexistent ID (Expect 404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "9999"]
+            },
+            "description": "Delete camera with nonexistent ID. Expects HTTP 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Photographer Operations",
+      "item": [
+        {
+          "name": "Add Photographer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rohan Verma\",\n  \"phone\": \"+91 9876543210\",\n  \"email\": \"rohan.v@lenslab.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/photographers",
+              "host": ["{{baseUrl}}"],
+              "path": ["photographers"]
+            },
+            "description": "Register a new photographer."
+          }
+        },
+        {
+          "name": "Get All Photographers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/photographers",
+              "host": ["{{baseUrl}}"],
+              "path": ["photographers"]
+            },
+            "description": "Retrieve all registered photographers."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Rental Operations (JOIN & Foreign Keys)",
+      "item": [
+        {
+          "name": "Add Rental",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photographer_id\": 1,\n  \"camera_id\": 1,\n  \"rental_date\": \"2026-11-20\",\n  \"return_date\": \"2026-11-22\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rentals",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals"]
+            },
+            "description": "Create a rental record associating a photographer and a camera."
+          }
+        },
+        {
+          "name": "Get Rentals with Names (SQL JOIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rentals",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals"]
+            },
+            "description": "Retrieve rental records with photographer name, camera name, kind, rental_date, return_date using SQL JOIN."
+          }
+        },
+        {
+          "name": "Delete Camera with Active Rental (Expect 409 Conflict)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cameras/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["cameras", "1"]
+            },
+            "description": "Attempt to delete a camera that has an active rental record. SQLite foreign key enforcement triggers HTTP 409 conflict."
+          }
+        }
+      ]
+    }
+  ]
+}
